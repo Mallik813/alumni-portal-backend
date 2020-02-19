@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 
 app.use("/api", (req, res) => {
-  res.send("It's working");
+  res.send("It's working")
 });
 
 // app.use("/users", require("./routes/users.js"));
@@ -18,5 +18,5 @@ app.get("*", (req, res) => {
 const port = config.port || 3001;
 
 app.listen(port, () =>
-  console.log(`API server ready at http://localhost:${port}`)
+  console.log(`API server ready at http://localhost:${port}`);
 );
