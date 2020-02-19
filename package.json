@@ -1,0 +1,24 @@
+{
+  "name": "alumni-portal-iiitm",
+  "version": "1.0.0",
+  "description": "Alumni portal of ABV-IIITM Gwalior",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mallik813/alumni-portal-iiitm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mallik813/alumni-portal-iiitm/issues"
+  },
+  "homepage": "https://github.com/Mallik813/alumni-portal-iiitm#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0"
+  }
+}
