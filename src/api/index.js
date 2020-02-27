@@ -3,7 +3,7 @@ const { MongoClient } = require('mongodb');
 const config = require('../utils/config');
 
 const router = express.Router();
-const register = require('./controllers/register');
+const signup = require('./controllers/signup');
 
 const url = config.host;
 
@@ -17,8 +17,8 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
 
   router.get('/', (req, res) => res.send('welcome'));
 
-  router.post('/register', (req, res) => {
-    register(req, res, db);
+  router.post('/signup', (req, res) => {
+    signup(req, res, db);
   });
 });
 
