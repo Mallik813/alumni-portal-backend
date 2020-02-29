@@ -5,8 +5,9 @@ const config = require('../utils/config');
 const router = express.Router();
 const signup = require('./controllers/signup');
 const login = require('./controllers/login');
-const user = require('./controllers/user');
+const indiUser = require('./controllers/user');
 const userAuth = require('./middlewares/user-auth');
+const posts = require('./controllers/posts');
 
 const url = config.host;
 
@@ -21,13 +22,27 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   router.get('/', (req, res) => res.send('welcome'));
 
   router.post('/signup', (req, res) => {
-    signup(req, res, db);
+    signup.handleSignup(req, res, db);
   });
   router.post('/login', (req, res) => {
     login(req, res, db);
   });
   router.get('/user', userAuth, (req, res) => {
-    user(req, res, db);
+    indiUser(req, res, db);
+  });
+  router.post('/posts', userAuth, (req, res) => {
+    posts(req, res, db);
+  });
+  router.get('/post/:postID', userAuth, async (req, res) => {
+    const post = await db.collection('posts').findOne({ _id: req.params.postID });
+    res.send(post);
+  });
+  router.get('/user/:userID', userAuth, async (req, res) => {
+    const user = await db
+      .collection('users')
+      .find({ _id: req.params.userID })
+      .toArray();
+    res.send(user);
   });
 });
 

@@ -16,4 +16,4 @@ const handleSignup = async (req, res, db) => {
   }
 };
 
-module.exports = handleSignup;
+module.exports = { handleSignup };
