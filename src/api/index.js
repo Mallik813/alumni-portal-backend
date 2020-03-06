@@ -5,7 +5,7 @@ const config = require('../utils/config');
 const router = express.Router();
 const signup = require('./controllers/signup');
 const login = require('./controllers/login');
-const indiUser = require('./controllers/user');
+const users = require('./controllers/user');
 const userAuth = require('./middlewares/user-auth');
 const posts = require('./controllers/posts');
 
@@ -27,13 +27,13 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   router.post('/login', (req, res) => {
     login(req, res, db);
   });
-  router.get('/user', userAuth, (req, res) => {
-    indiUser(req, res, db);
+  router.get('/users', userAuth, (req, res) => {
+    users(req, res, db);
   });
   router.post('/posts', userAuth, (req, res) => {
     posts(req, res, db);
   });
-  router.get('/post/:postID', userAuth, async (req, res) => {
+  router.get('/posts/:postID', userAuth, async (req, res) => {
     const post = await db.collection('posts').findOne({ _id: req.params.postID });
     res.send(post);
   });
