@@ -5,6 +5,6 @@ module.exports = async (req, res, db) => {
   await db.collection('posts').insertOne({ ID, title, text });
   const post = await db.collection('posts').findOne({ ID });
   const postID = post._id;
-  await db.collection('users').update({ email: req.user.email }, { $push: { Posts: postID } });
+  await db.collection('users').updateOne({ email: req.user.email }, { $push: { Posts: postID } });
   res.status(200).send('success');
 };

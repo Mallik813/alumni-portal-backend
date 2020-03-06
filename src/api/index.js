@@ -27,13 +27,20 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   router.post('/login', (req, res) => {
     login(req, res, db);
   });
+  router.get('/admin', userAuth, async (req, res) => {
+    const { email } = req.body;
+    const authCheck = await db.collection('users').findOne({ email });
+    const { isAdmin } = authCheck;
+    if (isAdmin) res.send('u r an admin');
+    else res.send('you are not an admin');
+  });
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
   });
   router.post('/posts', userAuth, (req, res) => {
     posts(req, res, db);
   });
-  router.get('/post/:postID', userAuth, async (req, res) => {
+  router.get('/posts/:postID', userAuth, async (req, res) => {
     const post = await db.collection('posts').findOne({ _id: req.params.postID });
     res.send(post);
   });

@@ -11,7 +11,7 @@ const handleSignup = async (req, res, db) => {
   if (errors.length) res.status(400).send(errors);
   else {
     const hash = await bcrypt.hash(password, 10);
-    await db.collection('users').insertOne({ name, email, phone, hash });
+    await db.collection('users').insertOne({ name, email, phone, hash, isAdmin: false });
     res.status(200).send('success');
   }
 };
