@@ -7,6 +7,7 @@ const signup = require('./controllers/signup');
 const login = require('./controllers/login');
 const indiUser = require('./controllers/user');
 const userAuth = require('./middlewares/user-auth');
+const verifyAdmin = require('./middlewares/verifyAdmin');
 const posts = require('./controllers/posts');
 
 const url = config.host;
@@ -27,17 +28,12 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   router.post('/login', (req, res) => {
     login(req, res, db);
   });
-  router.get('/admin', userAuth, async (req, res) => {
-    const { email } = req.body;
-    const authCheck = await db.collection('users').findOne({ email });
-    const { isAdmin } = authCheck;
-    if (isAdmin) {
-      const userToBeVerified = await db
-        .collection('admins')
-        .find({})
-        .toArray();
-      res.status(200).send(userToBeVerified);
-    } else res.send('you are not an admin');
+  router.get('/admin', userAuth, verifyAdmin(db), async (req, res) => {
+    const userToBeVerified = await db
+      .collection('admins')
+      .find({})
+      .toArray();
+    res.status(200).send(userToBeVerified);
   });
   //
   router.get('/user', userAuth, (req, res) => {

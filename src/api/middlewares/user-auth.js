@@ -7,6 +7,7 @@ module.exports = async (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     const decoded = jwt.verify(token, jwtSecret.pubKey, { algorithm: 'ES512' });
     req.user = decoded;
+
     next();
   } catch (err) {
     throw err;
