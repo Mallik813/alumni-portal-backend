@@ -31,9 +31,15 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     const { email } = req.body;
     const authCheck = await db.collection('users').findOne({ email });
     const { isAdmin } = authCheck;
-    if (isAdmin) res.send('u r an admin');
-    else res.send('you are not an admin');
+    if (isAdmin) {
+      const userToBeVerified = await db
+        .collection('admins')
+        .find({})
+        .toArray();
+      res.status(200).send(userToBeVerified);
+    } else res.send('you are not an admin');
   });
+  //
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
   });
