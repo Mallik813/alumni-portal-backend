@@ -1,6 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const {ObjectID}=require('mongodb');
+const { ObjectID } = require('mongodb');
 const config = require('../utils/config');
 
 const router = express.Router();
@@ -30,15 +30,37 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     login(req, res, db);
   });
   router.get('/admin', userAuth, verifyAdmin(db), async (req, res) => {
-    const userToBeVerifiedID = await db.collection('admins').find({}).toArray();
-    const users=await db.collection('users').find({}).toArray();
-    const userToBeVerified= users.filter(user => userToBeVerifiedID[0].usersToVerify.toString().includes(user._id));
+    const userToBeVerifiedID = await db
+      .collection('admins')
+      .find({})
+      .toArray();
+    const users = await db
+      .collection('users')
+      .find({})
+      .toArray();
+    const userToBeVerified = users.filter(user =>
+      userToBeVerifiedID[0].usersToVerify.toString().includes(user._id)
+    );
     res.status(200).send(userToBeVerified);
   });
-  router.get('/admin/confirm/:userID',userAuth, verifyAdmin(db),async(req,res)=>{
-   await db.collection('admins').updateOne({$pull:{usersToVerify:"5e6dec9306c3cc16b03d4e1"}});s
-   res.send('success');
-  })
+  // verifying user by deleting userID from admins->userToVerify array and setting isVerified Field true
+  router.get('/admin/confirm/:userID', userAuth, verifyAdmin(db), async (req, res) => {
+    await db
+      .collection('admins')
+      .updateOne({}, { $pull: { usersToVerify: ObjectID(req.params.userID) } });
+    await db
+      .collection('users')
+      .findOneAndUpdate({ _id: ObjectID(req.params.userID) }, { $set: { isVerified: true } });
+    res.send('user succesfully verified by admin');
+  });
+  // deleting user by deleting userID from admins-> userToVerify array
+  router.get('/admin/delete/:userID', userAuth, verifyAdmin(db), async (req, res) => {
+    await db
+      .collection('admins')
+      .updateOne({}, { $pull: { usersToVerify: ObjectID(req.params.userID) } });
+    res.send('user not verfied by admin and successfully deleted from database');
+  });
+
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
   });
