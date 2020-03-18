@@ -1,5 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
+const {ObjectID}=require('mongodb');
 const config = require('../utils/config');
 
 const router = express.Router();
@@ -29,13 +30,15 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     login(req, res, db);
   });
   router.get('/admin', userAuth, verifyAdmin(db), async (req, res) => {
-    const userToBeVerified = await db
-      .collection('admins')
-      .find({})
-      .toArray();
+    const userToBeVerifiedID = await db.collection('admins').find({}).toArray();
+    const users=await db.collection('users').find({}).toArray();
+    const userToBeVerified= users.filter(user => userToBeVerifiedID[0].usersToVerify.toString().includes(user._id));
     res.status(200).send(userToBeVerified);
   });
-  //
+  router.get('/admin/confirm/:userID',userAuth, verifyAdmin(db),async(req,res)=>{
+   await db.collection('admins').updateOne({$pull:{usersToVerify:"5e6dec9306c3cc16b03d4e1"}});s
+   res.send('success');
+  })
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
   });
@@ -44,12 +47,12 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   });
   router.get('/posts/:postID', userAuth, async (req, res) => {
     const post = await db.collection('posts').findOne({ _id: req.params.postID });
-    res.send(post);
+    res.status(200).send(post);
   });
   router.get('/user/:userID', userAuth, async (req, res) => {
     const user = await db
       .collection('users')
-      .find({ _id: req.params.userID })
+      .find({ _id: ObjectID(req.params.userID) })
       .toArray();
     res.send(user);
   });
