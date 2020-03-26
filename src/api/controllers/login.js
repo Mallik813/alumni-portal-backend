@@ -19,7 +19,6 @@ const handleLogin = async (req, res, db) => {
           algorithm: 'ES512',
           expiresIn: '30d',
         });
-
         res.status(200).send(token);
       } else {
         res.status(400).send('Incorrect password');
