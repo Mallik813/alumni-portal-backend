@@ -6,7 +6,7 @@ const config = require('../utils/config');
 const router = express.Router();
 const signup = require('./controllers/signup');
 const login = require('./controllers/login');
-const indiUser = require('./controllers/user');
+const users = require('./controllers/user');
 const userAuth = require('./middlewares/user-auth');
 const verifyAdmin = require('./middlewares/verifyAdmin');
 const posts = require('./controllers/posts');
@@ -29,6 +29,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
   router.post('/login', (req, res) => {
     login(req, res, db);
   });
+
   router.get('/admin', userAuth, verifyAdmin(db), async (req, res) => {
     const userToBeVerifiedID = await db
       .collection('admins')
@@ -63,6 +64,10 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
 
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
+
+  router.get('/users', userAuth, (req, res) => {
+    users(req, res, db);
+
   });
   router.post('/posts', userAuth, (req, res) => {
     posts(req, res, db);
