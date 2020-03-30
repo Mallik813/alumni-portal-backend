@@ -2,6 +2,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const { ObjectID } = require('mongodb');
 const config = require('../utils/config');
+const jwt=require('jsonwebtoken');
 
 const router = express.Router();
 const signup = require('./controllers/signup');
@@ -30,6 +31,30 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     login(req, res, db);
   });
 
+  //verifying email route
+
+  router.get('/verifyEmail/:token',async(req,res)=>{
+    const token=req.params.token;
+    jwt.verify(token,process.env.TOKEN_ACCESS_SECRET,async(err,decoded)=>{
+        if(err){
+            res.status(401).send({message: err.message})
+        }
+        else{
+            const userid=decoded.id;
+           // console.log(userid);
+            await db
+               .collection('users')
+               .findOneAndUpdate({ _id: ObjectID(userid) }, { $set: { isEmailVerified: true } });
+            //console.log(users);
+            try {
+              res.redirect('/api/login')
+          } catch (error) {
+              res.status(400).send(error)
+          } 
+        }     
+    })
+  })
+
   router.get('/admin', userAuth, verifyAdmin(db), async (req, res) => {
     const userToBeVerifiedID = await db
       .collection('admins')
@@ -44,6 +69,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
     );
     res.status(200).send(userToBeVerified);
   });
+
   // verifying user by deleting userID from admins->userToVerify array and setting isVerified Field true
   router.get('/admin/confirm/:userID', userAuth, verifyAdmin(db), async (req, res) => {
     await db
@@ -54,6 +80,7 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
       .findOneAndUpdate({ _id: ObjectID(req.params.userID) }, { $set: { isVerified: true } });
     res.send('user succesfully verified by admin');
   });
+
   // deleting user by deleting userID from admins-> userToVerify array
   router.get('/admin/delete/:userID', userAuth, verifyAdmin(db), async (req, res) => {
     await db
@@ -64,10 +91,12 @@ MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
 
   router.get('/user', userAuth, (req, res) => {
     indiUser(req, res, db);
-  }
+  });
+
   router.post('/posts', userAuth, (req, res) => {
     posts(req, res, db);
   });
+
   router.get('/posts/:postID', userAuth, async (req, res) => {
     const post = await db.collection('posts').findOne({ _id: req.params.postID });
     res.status(200).send(post);
